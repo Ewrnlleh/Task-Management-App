@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Task, TaskStatus, Person } from '../src/types';
-import { STATUS_ORDER } from '../src/constants';
+import { Task, TaskStatus, Person } from '../types';
+import { STATUS_ORDER } from '../../constants';
 import { XIcon } from './Icons';
 
 interface TaskModalProps {
