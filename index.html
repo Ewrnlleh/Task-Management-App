@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Görev Yönetim Sistemi</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Görev Yönetim Sistemi</h1>
+            <div class="header-actions">
+                <button id="addTaskBtn" class="btn btn-primary">+ Yeni Görev Ekle</button>
+                <button id="manageAssigneesBtn" class="btn btn-secondary">Kişileri Yönet</button>
+            </div>
+        </header>
+
+        <div class="filters">
+            <label for="assigneeFilter">Atanan Kişiye Göre Filtrele:</label>
+            <select id="assigneeFilter">
+                <option value="">Tüm Görevler</option>
+            </select>
+        </div>
+
+        <div class="status-columns">
+            <div class="status-column" data-status="Yeni Talep">
+                <h2 class="status-header status-yeni">Yeni Talep</h2>
+                <div class="tasks-container" id="tasks-yeni"></div>
+            </div>
+            <div class="status-column" data-status="Devam Ediyor">
+                <h2 class="status-header status-devam">Devam Ediyor</h2>
+                <div class="tasks-container" id="tasks-devam"></div>
+            </div>
+            <div class="status-column" data-status="Beklemede">
+                <h2 class="status-header status-beklemede">Beklemede</h2>
+                <div class="tasks-container" id="tasks-beklemede"></div>
+            </div>
+            <div class="status-column" data-status="Test Aşamasında">
+                <h2 class="status-header status-test">Test Aşamasında</h2>
+                <div class="tasks-container" id="tasks-test"></div>
+            </div>
+            <div class="status-column" data-status="Tamamlandı">
+                <h2 class="status-header status-tamamlandi">Tamamlandı</h2>
+                <div class="tasks-container" id="tasks-tamamlandi"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Yeni Görev</h2>
+            <form id="taskForm">
+                <input type="hidden" id="taskId">
+                
+                <div class="form-group">
+                    <label for="taskTitle">Görev Başlığı *</label>
+                    <input type="text" id="taskTitle" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDescription">Açıklama</label>
+                    <textarea id="taskDescription" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskStatus">Durum *</label>
+                    <select id="taskStatus" required>
+                        <option value="Yeni Talep">Yeni Talep</option>
+                        <option value="Devam Ediyor">Devam Ediyor</option>
+                        <option value="Beklemede">Beklemede</option>
+                        <option value="Test Aşamasında">Test Aşamasında</option>
+                        <option value="Tamamlandı">Tamamlandı</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDueDate">Bitiş Tarihi *</label>
+                    <input type="date" id="taskDueDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Atanan Kişiler</label>
+                    <div id="assigneeCheckboxes" class="checkbox-group"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskFeedback">İlk Durum Notu</label>
+                    <textarea id="taskFeedback" rows="2" placeholder="İsteğe bağlı ilk durum notu"></textarea>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div id="taskDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="taskDetail"></div>
+        </div>
+    </div>
+
+    <!-- Assignee Modal -->
+    <div id="assigneeModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Kişi Yönetimi</h2>
+            <form id="assigneeForm">
+                <div class="form-group">
+                    <label for="assigneeName">İsim *</label>
+                    <input type="text" id="assigneeName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="assigneeEmail">E-posta</label>
+                    <input type="email" id="assigneeEmail">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Kişi Ekle</button>
+            </form>
+            
+            <h3>Mevcut Kişiler</h3>
+            <div id="assigneeList"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
