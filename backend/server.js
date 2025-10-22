@@ -15,7 +15,7 @@ app.use(express.json());
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: 'your_mysql_password', // <-- REPLACE WITH YOUR PASSWORD
+    password: '1234', // <-- REPLACE WITH YOUR PASSWORD
     database: 'task_manager'
 };
 
