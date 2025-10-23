@@ -38,16 +38,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskSelect }) => {
           </div>
         ) : <div />}
         <div className="flex items-center">
-            <div className="flex -space-x-3">
-              {visibleAssignees.map(assignee => (
-                <img
-                  key={assignee.id}
-                  src={assignee.avatarUrl}
-                  alt={assignee.name}
-                  className="w-8 h-8 rounded-full border-2 border-gray-800"
-                  title={assignee.name}
-                />
-              ))}
+              <div className="flex -space-x-3">
+                {visibleAssignees.map((person) => (
+                  <span key={person.id} className="w-8 h-8 rounded-full bg-gray-900 ring-2 ring-gray-800 overflow-hidden inline-flex" title={person.name}>
+                    <img
+                      src={person.avatarUrl}
+                      alt={person.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </span>
+                ))}
             </div>
             {hiddenAssigneesCount > 0 && (
                 <div className="w-8 h-8 rounded-full bg-gray-600 border-2 border-gray-800 flex items-center justify-center text-xs font-bold text-gray-300 ml-[-12px] z-10">

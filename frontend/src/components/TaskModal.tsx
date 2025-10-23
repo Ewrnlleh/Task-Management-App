@@ -111,9 +111,13 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task, onUpdateTa
                 sortedFeedback.map(fb => (
                     <div key={fb.id} className="bg-gray-700/50 p-3 rounded-lg">
               <div className="flex items-center space-x-2 mb-2">
-                {fb.user_avatar && (
-                  <img src={fb.user_avatar} alt={fb.user_name} className="w-6 h-6 rounded-full" />
-                )}
+                  <span className="w-8 h-8 rounded-full bg-gray-900 ring-1 ring-gray-700 overflow-hidden inline-flex">
+                    <img
+                      src={fb.user_avatar || 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(fb.user_name || 'Kullanıcı')}
+                      alt={fb.user_name || 'Kullanıcı'}
+                      className="w-full h-full object-cover"
+                    />
+                  </span>
                 <span className="text-sm font-semibold text-indigo-400">{fb.user_name || 'Bilinmeyen Kullanıcı'}</span>
                 <span className="text-xs text-gray-500">•</span>
                 <span className="text-xs text-gray-500">{fb.timestamp.toLocaleString('tr-TR')}</span>

@@ -37,7 +37,9 @@ const Header: React.FC<HeaderProps> = ({ onAddTaskClick, people, selectedFilterI
       </div>
       <div className="flex items-center space-x-3">
         <div className="flex items-center space-x-2 px-3 py-2 bg-gray-800 rounded-md">
-          <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-8 h-8 rounded-full" />
+          <div className="w-8 h-8 rounded-full bg-gray-900 ring-1 ring-gray-700 overflow-hidden">
+            <img src={currentUser.avatarUrl || ('https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(currentUser.name))} alt={currentUser.name} className="w-full h-full object-cover" />
+          </div>
           <span className="text-sm text-gray-200">{currentUser.name}</span>
         </div>
         <div className="relative" ref={filterRef}>
@@ -64,7 +66,9 @@ const Header: React.FC<HeaderProps> = ({ onAddTaskClick, people, selectedFilterI
                       onChange={() => onFilterChange(person.id)}
                       className="h-4 w-4 rounded border-gray-500 bg-gray-900 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0"
                     />
-                    <img src={person.avatarUrl} alt={person.name} className="w-6 h-6 rounded-full mx-3" />
+                    <span className="mx-3 w-6 h-6 rounded-full bg-gray-900 ring-1 ring-gray-700 overflow-hidden inline-flex">
+                      <img src={person.avatarUrl} alt={person.name} className="w-full h-full object-cover" />
+                    </span>
                     <span>{person.name}</span>
                   </label>
                 ))}
