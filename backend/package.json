@@ -2,7 +2,7 @@
 {
   "name": "task-manager-backend",
   "version": "1.0.0",
-  "description": "Backend for the Kanban Task Manager",
+  "description": "Backend for the  Görev Yönetimi Uygulaması",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

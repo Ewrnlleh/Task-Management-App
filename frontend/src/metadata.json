@@ -1,5 +1,5 @@
 {
-  "name": "Kanban Task Manager",
-  "description": "A simple and aesthetic task management web application using a Kanban board. Assign tasks to individuals, track their progress through different stages, and provide feedback.",
+  "name": "Görev Yönetimi Uygulaması",
+  "description": "Basit ve estetik bir görev yönetimi web uygulaması. Görevleri bireylere atayın, ilerlemelerini farklı aşamalar üzerinden takip edin ve geri bildirimde bulunun.",
   "requestFramePermissions": []
 }
