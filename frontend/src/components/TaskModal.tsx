@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Task, TaskStatus, Person } from '../types';
-import { STATUS_ORDER } from '../../constants';
+import { STATUS_ORDER } from '../constants';
 import { XIcon } from './Icons';
 
 interface TaskModalProps {
@@ -72,7 +72,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task, onUpdateTa
               onChange={handleStatusChange}
               className="w-full bg-gray-700 text-white rounded-md border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 p-2"
             >
-              {STATUS_ORDER.map(status => (
+              {STATUS_ORDER.map((status: TaskStatus) => (
                 <option key={status} value={status}>{status}</option>
               ))}
             </select>

@@ -37,7 +37,7 @@ CREATE TABLE `people` (
 -- TASKS TABLOSU - Görevler
 -- ====================================================
 CREATE TABLE `tasks` (
-    `id` VARCHAR(36) NOT NULL PRIMARY KEY,
+    `id` VARCHAR(100) NOT NULL PRIMARY KEY,
     `title` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
     `status` ENUM(
@@ -60,7 +60,7 @@ CREATE TABLE `tasks` (
 -- ====================================================
 CREATE TABLE `task_assignees` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `task_id` VARCHAR(36) NOT NULL,
+    `task_id` VARCHAR(100) NOT NULL,
     `person_id` VARCHAR(36) NOT NULL,
     `assigned_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`) ON DELETE CASCADE,
@@ -74,10 +74,10 @@ CREATE TABLE `task_assignees` (
 -- FEEDBACK TABLOSU - Görev Geri Bildirimleri
 -- ====================================================
 CREATE TABLE `feedback` (
-    `id` VARCHAR(36) NOT NULL PRIMARY KEY,
+    `id` VARCHAR(100) NOT NULL PRIMARY KEY,
     `text` TEXT NOT NULL,
     `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `task_id` VARCHAR(36) NOT NULL,
+    `task_id` VARCHAR(100) NOT NULL,
     FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`) ON DELETE CASCADE,
     INDEX `idx_feedback_task` (`task_id`),
     INDEX `idx_feedback_timestamp` (`timestamp`)
