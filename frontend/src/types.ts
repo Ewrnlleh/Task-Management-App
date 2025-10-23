@@ -9,6 +9,7 @@ export enum TaskStatus {
 export interface Person {
   id: string;
   name: string;
+  email: string;
   avatarUrl: string;
 }
 
@@ -16,6 +17,9 @@ export interface Feedback {
   id: string;
   text: string;
   timestamp: Date;
+  user_id: string;
+  user_name?: string;
+  user_avatar?: string;
 }
 
 export interface Task {

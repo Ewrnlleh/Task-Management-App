@@ -7,9 +7,11 @@ interface HeaderProps {
   people: Person[];
   selectedFilterIds: string[];
   onFilterChange: (personId: string) => void;
+  currentUser: Person;
+  onLogout: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAddTaskClick, people, selectedFilterIds, onFilterChange }) => {
+const Header: React.FC<HeaderProps> = ({ onAddTaskClick, people, selectedFilterIds, onFilterChange, currentUser, onLogout }) => {
   const [isFilterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
@@ -34,6 +36,10 @@ const Header: React.FC<HeaderProps> = ({ onAddTaskClick, people, selectedFilterI
         <h1 className="text-2xl font-bold text-white">Görev Yönetimi</h1>
       </div>
       <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 px-3 py-2 bg-gray-800 rounded-md">
+          <img src={currentUser.avatarUrl} alt={currentUser.name} className="w-8 h-8 rounded-full" />
+          <span className="text-sm text-gray-200">{currentUser.name}</span>
+        </div>
         <div className="relative" ref={filterRef}>
           <button
             onClick={() => setFilterOpen(prev => !prev)}
@@ -73,6 +79,15 @@ const Header: React.FC<HeaderProps> = ({ onAddTaskClick, people, selectedFilterI
           <PlusIcon className="w-5 h-5 mr-2" />
           Yeni Görev
         </button>
+          <button
+            onClick={onLogout}
+            className="flex items-center justify-center px-3 py-2 bg-red-600 text-white rounded-md font-semibold hover:bg-red-500 transition-colors duration-200"
+            title="Çıkış Yap"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+          </button>
       </div>
     </header>
   );

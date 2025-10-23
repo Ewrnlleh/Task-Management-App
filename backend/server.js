@@ -33,11 +33,17 @@ const getTasksWithDetails = async () => {
     const [tasks] = await pool.query('SELECT * FROM tasks ORDER BY title ASC');
     for (const task of tasks) {
         const [assignees] = await pool.query(`
-            SELECT p.* FROM people p
+                SELECT p.id, p.name, p.email, p.avatarUrl FROM people p
             JOIN task_assignees ta ON p.id = ta.person_id
             WHERE ta.task_id = ?
         `, [task.id]);
-        const [feedback] = await pool.query('SELECT * FROM feedback WHERE task_id = ? ORDER BY timestamp DESC', [task.id]);
+            const [feedback] = await pool.query(`
+                SELECT f.*, p.name as user_name, p.avatarUrl as user_avatar 
+                FROM feedback f
+                LEFT JOIN people p ON f.user_id = p.id
+                WHERE f.task_id = ? 
+                ORDER BY f.timestamp DESC
+            `, [task.id]);
         task.assignees = assignees;
         task.feedback = feedback;
         // Format date to YYYY-MM-DD for consistency
@@ -49,11 +55,33 @@ const getTasksWithDetails = async () => {
 };
 
 // --- API Endpoints ---
+// Health check
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// POST login
+app.post('/api/login', async (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+    }
+    
+    try {
+        const [users] = await pool.query('SELECT id, name, email, avatarUrl FROM people WHERE email = ? AND password = ?', [email, password]);
+        if (users.length === 0) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+        res.json({ user: users[0], message: 'Login successful' });
+    } catch (err) {
+        res.status(500).json({ error: 'Database query failed', details: err.message });
+    }
+});
 
 // GET all people
 app.get('/api/people', async (req, res) => {
     try {
-        const [people] = await pool.query('SELECT * FROM people');
+        const [people] = await pool.query('SELECT id, name, email, avatarUrl FROM people');
         res.json(people);
     } catch (err) {
         res.status(500).json({ error: 'Database query failed', details: err.message });
@@ -146,17 +174,17 @@ app.put('/api/tasks/:id', async (req, res) => {
 // POST new feedback for a task
 app.post('/api/tasks/:id/feedback', async (req, res) => {
     const { id: taskId } = req.params;
-    const { text } = req.body;
-    if (!text) {
-        return res.status(400).json({ error: 'Feedback text is required' });
+        const { text, userId } = req.body;
+        if (!text || !userId) {
+            return res.status(400).json({ error: 'Feedback text and userId are required' });
     }
     
     try {
         const feedbackId = randomUUID();
         const timestamp = new Date();
         await pool.query(
-            'INSERT INTO feedback (id, text, timestamp, task_id) VALUES (?, ?, ?, ?)',
-            [feedbackId, text, timestamp, taskId]
+                'INSERT INTO feedback (id, text, timestamp, task_id, user_id) VALUES (?, ?, ?, ?, ?)',
+                [feedbackId, text, timestamp, taskId, userId]
         );
         const tasks = await getTasksWithDetails();
         res.status(201).json(tasks);

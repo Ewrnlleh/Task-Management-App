@@ -110,8 +110,15 @@ const TaskModal: React.FC<TaskModalProps> = ({ isOpen, onClose, task, onUpdateTa
             {sortedFeedback.length > 0 ? (
                 sortedFeedback.map(fb => (
                     <div key={fb.id} className="bg-gray-700/50 p-3 rounded-lg">
+              <div className="flex items-center space-x-2 mb-2">
+                {fb.user_avatar && (
+                  <img src={fb.user_avatar} alt={fb.user_name} className="w-6 h-6 rounded-full" />
+                )}
+                <span className="text-sm font-semibold text-indigo-400">{fb.user_name || 'Bilinmeyen Kullanıcı'}</span>
+                <span className="text-xs text-gray-500">•</span>
+                <span className="text-xs text-gray-500">{fb.timestamp.toLocaleString('tr-TR')}</span>
+              </div>
                         <p className="text-gray-200">{fb.text}</p>
-                        <p className="text-xs text-gray-500 mt-1 text-right">{fb.timestamp.toLocaleString('tr-TR')}</p>
                     </div>
                 ))
             ) : (

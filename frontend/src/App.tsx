@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Task, TaskStatus, Person } from './types';
 import { STATUS_ORDER } from './constants';
+import Login from './components/Login';
+import { fetchJson } from './utils/http';
 import Header from './components/Header';
 import TaskBoard from './components/TaskBoard';
 import AddTaskModal from './components/AddTaskModal';
@@ -21,25 +23,29 @@ const processTasksData = (tasksData: any[]): Task[] => {
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [people, setPeople] = useState<Person[]>([]);
+    const [currentUser, setCurrentUser] = useState<Person | null>(null);
   const [isAddTaskModalOpen, setAddTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [filterAssigneeIds, setFilterAssigneeIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+      // Check for saved user in localStorage
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+    }, []);
+
+    useEffect(() => {
+      if (!currentUser) return;
+    
     const fetchData = async () => {
       try {
-        const [tasksResponse, peopleResponse] = await Promise.all([
-          fetch(`${API_BASE_URL}/tasks`),
-          fetch(`${API_BASE_URL}/people`)
+        const [tasksData, peopleData] = await Promise.all([
+          fetchJson(`${API_BASE_URL}/tasks`),
+          fetchJson(`${API_BASE_URL}/people`)
         ]);
-
-        if (!tasksResponse.ok || !peopleResponse.ok) {
-          throw new Error('Failed to fetch initial data from the server.');
-        }
-
-        const tasksData = await tasksResponse.json();
-        const peopleData = await peopleResponse.json();
 
         setTasks(processTasksData(tasksData));
         setPeople(peopleData);
@@ -49,17 +55,31 @@ const App: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [currentUser]);
+
+  const handleLogin = (user: Person) => {
+    setCurrentUser(user);
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('currentUser');
+    setTasks([]);
+    setPeople([]);
+  };
+
+  if (!currentUser) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   const handleAddTask = async (taskData: { title: string; description: string; assigneeIds: string[]; dueDate?: string }) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/tasks`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(taskData)
-        });
-        if (!response.ok) throw new Error('Failed to add task.');
-        const updatedTasks = await response.json();
+    const updatedTasks = await fetchJson(`${API_BASE_URL}/tasks`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(taskData)
+    });
         setTasks(processTasksData(updatedTasks));
         setAddTaskModalOpen(false);
     } catch (err) {
@@ -70,13 +90,11 @@ const App: React.FC = () => {
   
   const handleUpdateTask = async (updatedTask: Task) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/tasks/${updatedTask.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedTask)
-        });
-        if (!response.ok) throw new Error('Failed to update task.');
-        const updatedTasks = await response.json();
+    const updatedTasks = await fetchJson(`${API_BASE_URL}/tasks/${updatedTask.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedTask)
+    });
         setTasks(processTasksData(updatedTasks));
         
         // Update the selected task as well to reflect changes immediately in the modal
@@ -98,20 +116,18 @@ const App: React.FC = () => {
   
   const handleAddFeedback = async (taskId: string, feedbackText: string) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/tasks/${taskId}/feedback`, {
+        const updatedTasks = await fetchJson(`${API_BASE_URL}/tasks/${taskId}/feedback`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: feedbackText })
+              body: JSON.stringify({ text: feedbackText, userId: currentUser.id })
         });
-        if (!response.ok) throw new Error('Failed to add feedback.');
-        const updatedTasks = await response.json();
         setTasks(processTasksData(updatedTasks));
 
         const newlyUpdatedTask = processTasksData(updatedTasks).find((t: Task) => t.id === taskId);
         setSelectedTask(newlyUpdatedTask || null);
-    } catch (err) {
+      } catch (err: any) {
         console.error(err);
-        setError('Durum eklenirken bir hata oluştu.');
+        setError(err?.message || 'Durum eklenirken bir hata oluştu.');
     }
   };
   
@@ -147,6 +163,8 @@ const App: React.FC = () => {
         people={people}
         selectedFilterIds={filterAssigneeIds}
         onFilterChange={handleFilterChange}
+          currentUser={currentUser}
+          onLogout={handleLogout}
       />
       <main className="flex-1 overflow-x-auto p-4 md:p-6">
         <TaskBoard 

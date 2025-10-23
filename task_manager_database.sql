@@ -27,10 +27,13 @@ DROP TABLE IF EXISTS `people`;
 CREATE TABLE `people` (
     `id` VARCHAR(36) NOT NULL PRIMARY KEY,
     `name` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL UNIQUE,
+    `password` VARCHAR(255) NOT NULL,
     `avatarUrl` TEXT,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX `idx_people_name` (`name`)
+    INDEX `idx_people_name` (`name`),
+    INDEX `idx_people_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ====================================================
@@ -78,22 +81,25 @@ CREATE TABLE `feedback` (
     `text` TEXT NOT NULL,
     `timestamp` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `task_id` VARCHAR(100) NOT NULL,
+    `user_id` VARCHAR(36) NOT NULL,
     FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `people`(`id`) ON DELETE CASCADE,
     INDEX `idx_feedback_task` (`task_id`),
-    INDEX `idx_feedback_timestamp` (`timestamp`)
+    INDEX `idx_feedback_timestamp` (`timestamp`),
+    INDEX `idx_feedback_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ====================================================
 -- ÖRNEK VERİLER - Sample Data
 -- ====================================================
 
--- Örnek Kullanıcılar
-INSERT INTO `people` (`id`, `name`, `avatarUrl`) VALUES
-('550e8400-e29b-41d4-a716-446655440001', 'Ahmet Yılmaz', 'https://api.dicebear.com/7.x/avataaars/svg?seed=ahmet'),
-('550e8400-e29b-41d4-a716-446655440002', 'Elif Kaya', 'https://api.dicebear.com/7.x/avataaars/svg?seed=elif'),
-('550e8400-e29b-41d4-a716-446655440003', 'Mehmet Demir', 'https://api.dicebear.com/7.x/avataaars/svg?seed=mehmet'),
-('550e8400-e29b-41d4-a716-446655440004', 'Zeynep Öztürk', 'https://api.dicebear.com/7.x/avataaars/svg?seed=zeynep'),
-('550e8400-e29b-41d4-a716-446655440005', 'Burak Şahin', 'https://api.dicebear.com/7.x/avataaars/svg?seed=burak');
+-- Örnek Kullanıcılar (Şifre: 123456 - Üretimde mutlaka hash'lenmeli!)
+INSERT INTO `people` (`id`, `name`, `email`, `password`, `avatarUrl`) VALUES
+('550e8400-e29b-41d4-a716-446655440001', 'Ahmet Yılmaz', 'ahmet@example.com', '123456', 'https://api.dicebear.com/7.x/avataaars/svg?seed=ahmet'),
+('550e8400-e29b-41d4-a716-446655440002', 'Elif Kaya', 'elif@example.com', '123456', 'https://api.dicebear.com/7.x/avataaars/svg?seed=elif'),
+('550e8400-e29b-41d4-a716-446655440003', 'Mehmet Demir', 'mehmet@example.com', '123456', 'https://api.dicebear.com/7.x/avataaars/svg?seed=mehmet'),
+('550e8400-e29b-41d4-a716-446655440004', 'Zeynep Öztürk', 'zeynep@example.com', '123456', 'https://api.dicebear.com/7.x/avataaars/svg?seed=zeynep'),
+('550e8400-e29b-41d4-a716-446655440005', 'Burak Şahin', 'burak@example.com', '123456', 'https://api.dicebear.com/7.x/avataaars/svg?seed=burak');
 
 -- Örnek Görevler
 INSERT INTO `tasks` (`id`, `title`, `description`, `status`, `dueDate`) VALUES
@@ -119,12 +125,12 @@ INSERT INTO `task_assignees` (`task_id`, `person_id`) VALUES
 ('task-550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440005');
 
 -- Örnek Geri Bildirimler
-INSERT INTO `feedback` (`id`, `text`, `timestamp`, `task_id`) VALUES
-('feedback-550e8400-e29b-41d4-a716-446655440001', 'İlk tasarım taslağı hazırlandı. İncelemenizi bekliyoruz.', '2025-10-20 10:30:00', 'task-550e8400-e29b-41d4-a716-446655440001'),
-('feedback-550e8400-e29b-41d4-a716-446655440002', 'Tasarım güzel görünüyor, ancak mobil versiyonda bazı düzenlemeler gerekli.', '2025-10-21 14:15:00', 'task-550e8400-e29b-41d4-a716-446655440001'),
-('feedback-550e8400-e29b-41d4-a716-446655440003', 'API entegrasyonu %80 tamamlandı. Test aşamasına geçebiliriz.', '2025-10-22 09:45:00', 'task-550e8400-e29b-41d4-a716-446655440002'),
-('feedback-550e8400-e29b-41d4-a716-446655440004', 'Güvenlik testleri başarıyla tamamlandı. Herhangi bir açık bulunamadı.', '2025-10-19 16:20:00', 'task-550e8400-e29b-41d4-a716-446655440005'),
-('feedback-550e8400-e29b-41d4-a716-446655440005', 'Test raporu hazırlandı ve dökümantasyon güncellendi.', '2025-10-20 11:00:00', 'task-550e8400-e29b-41d4-a716-446655440005');
+INSERT INTO `feedback` (`id`, `text`, `timestamp`, `task_id`, `user_id`) VALUES
+('feedback-550e8400-e29b-41d4-a716-446655440001', 'İlk tasarım taslağı hazırlandı. İncelemenizi bekliyoruz.', '2025-10-20 10:30:00', 'task-550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440001'),
+('feedback-550e8400-e29b-41d4-a716-446655440002', 'Tasarım güzel görünüyor, ancak mobil versiyonda bazı düzenlemeler gerekli.', '2025-10-21 14:15:00', 'task-550e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440002'),
+('feedback-550e8400-e29b-41d4-a716-446655440003', 'API entegrasyonu %80 tamamlandı. Test aşamasına geçebiliriz.', '2025-10-22 09:45:00', 'task-550e8400-e29b-41d4-a716-446655440002', '550e8400-e29b-41d4-a716-446655440003'),
+('feedback-550e8400-e29b-41d4-a716-446655440004', 'Güvenlik testleri başarıyla tamamlandı. Herhangi bir açık bulunamadı.', '2025-10-19 16:20:00', 'task-550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440003'),
+('feedback-550e8400-e29b-41d4-a716-446655440005', 'Test raporu hazırlandı ve dökümantasyon güncellendi.', '2025-10-20 11:00:00', 'task-550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440005');
 
 -- ====================================================
 -- KULLANIŞLI GÖRÜNÜMLER (VIEWS)
